@@ -1,0 +1,309 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "sonarsource.jlfowle.github.io/v1alpha1",
+          "kind": "SonarQube",
+          "metadata": {
+            "name": "example-sonarqube"
+          },
+          "spec": {}
+        }
+      ]
+    capabilities: Basic Install
+  name: sonarqube-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: SonarQube is the Schema for the sonarqubes API
+      displayName: SonarQube Server
+      kind: SonarQube
+      name: sonarqubes.sonarsource.jlfowle.github.io
+      resources:
+      - kind: Deployment
+        name: ""
+        version: v1
+      - kind: PersistentVolumeClaim
+        name: ""
+        version: v1
+      - kind: Secret
+        name: ""
+        version: v1
+      - kind: Service
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: community, developer, or enterprise (default is community)
+        displayName: Edition
+        path: edition
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: External base URL
+        displayName: External URL
+        path: externalURL
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: SonarQube application hosts list
+        displayName: Hosts
+        path: hosts
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:hosts
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Node Affinity
+        displayName: Node Affinity
+        path: nodeConfig.nodeAffinity
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:nodeAffinity
+      - description: Node selector
+        displayName: Node Selector
+        path: nodeConfig.nodeSelector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:selector:Node
+      - description: Pod Affinity
+        displayName: Pod Affinity
+        path: nodeConfig.podAffinity
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:podAffinity
+      - description: Pod AntiAffinity
+        displayName: Pod AntiAffinity
+        path: nodeConfig.podAntiAffinity
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:podAntiAffinity
+      - description: Priority Class Name
+        displayName: Priority Class
+        path: nodeConfig.priorityClass
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Resource requirements
+        displayName: Resources
+        path: nodeConfig.resources
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - description: Storage class
+        displayName: Storage Class
+        path: nodeConfig.storageClass
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:StorageClass
+      - description: Size of Storage (ex 1Gi)
+        displayName: Storage Size
+        path: nodeConfig.storageSize
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: SonarQube search hosts list
+        displayName: Search Hosts
+        path: searchHosts
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:searchHosts
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Secret with sonar configuration files (sonar.properties, wrapper.properties).
+          Don't add cluster properties to configuration files as this could cause
+          unexpected results
+        displayName: Secret
+        path: secret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Service Account
+        displayName: Service Account
+        path: serviceAccount
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Shutdown SonarQube server
+        displayName: Shutdown
+        path: shutdown
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Sonar Node Type application or search when clustering is enabled
+          otherwise aio (all-in-one)
+        displayName: Server Type
+        path: type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:aio
+        - urn:alm:descriptor:com.tectonic.ui:select:application
+        - urn:alm:descriptor:com.tectonic.ui:select:search
+      - description: Automatically apply major version updates
+        displayName: Major
+        path: updatesMajor
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:checkbox
+        - urn:alm:descriptor:com.tectonic.ui:fieldGroup:updates
+      - description: Automatically apply minor version updates
+        displayName: Minor
+        path: updatesMinor
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:checkbox
+        - urn:alm:descriptor:com.tectonic.ui:fieldGroup:updates
+      - description: if empty operator will start latest version of selected edition
+          then lock the version
+        displayName: Version
+        path: version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      statusDescriptors:
+      - description: Status of pods
+        displayName: Pod Statuses
+        path: deployment
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podStatuses
+      - description: Kubernetes service that can be used to expose SonarQube
+        displayName: Service
+        path: service
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Service
+      version: v1alpha1
+  description: Deploy and configure SonarQube
+  displayName: SonarQube
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments:
+      - name: sonarqube-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: sonarqube-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: sonarqube-operator
+            spec:
+              containers:
+              - command:
+                - sonarqube-operator
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: sonarqube-operator
+                image: quay.io/jlfowle/sonarqube-operator:0.0.1
+                imagePullPolicy: Always
+                name: sonarqube-operator
+                resources: {}
+              serviceAccountName: sonarqube-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - sonarqube-operator
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - replicasets
+          - deployments
+          verbs:
+          - get
+        - apiGroups:
+          - sonarsource.jlfowle.github.io
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: sonarqube-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - sonarqube
+  links:
+  - name: Sonarqube Operator
+    url: https://sonarqube-operator.domain
+  maintainers:
+  - email: jasph.fowler@gmail.com
+    name: jlfowle
+  maturity: alpha
+  provider:
+    name: jlfowle
+    url: https://github.com/jlfowle/sonarqube-operator
+  version: 0.0.1
