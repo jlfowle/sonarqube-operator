@@ -57,6 +57,8 @@ jobs:
           echo '${{ steps.file_changes.outputs.files_removed }}'
   build:
     name: Build
+    outputs:
+      image: ${{ steps.build.outputs.image }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Operator-sdk
@@ -115,4 +117,4 @@ jobs:
           kubernetes version: 'v1.18.2'
           github token: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
-        run: operator-sdk test local ./test/e2e --image ${{ jobs.build.steps.build.outputs.image }} --go-test-flags "-v"
+        run: operator-sdk test local ./test/e2e --image ${{ needs.build.outputs.image }} --go-test-flags "-v"
