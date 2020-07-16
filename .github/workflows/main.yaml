@@ -25,10 +25,10 @@ jobs:
           cache-name: cache-go-modules
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
             ${{ runner.os }}-
       - name: Get dependencies
         run: go get -v -t -d ./...
@@ -80,7 +80,39 @@ jobs:
         run: echo ::set-output name=version::$(grep Version version/version.go | awk -F'"' '{print $2}')
         id: version
       - name: Build
+        id: build
         run: |
           operator-sdk build quay.io/jlfowle/sonarqube-operator:${{ steps.version.outputs.version }}-${{ github.run_id }}
           docker login quay.io -u ${{ secrets.QUAY_USERNAME }} -p ${{ secrets.QUAY_TOKEN }}
           docker push quay.io/jlfowle/sonarqube-operator:${{ steps.version.outputs.version }}-${{ github.run_id }}
+          echo ::set-output name=image::quay.io/jlfowle/sonarqube-operator:${{ steps.version.outputs.version }}-${{ github.run_id }}
+  e2e:
+    name: e2e Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set up Operator-sdk
+        uses: shivanshs9/setup-k8s-operator-sdk@v1
+        with:
+          version: ^0.18.2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Cache go modules
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-go-modules
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-e2ee-${{ env.cache-name }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-${{ env.cache-name }}-
+            ${{ runner.os }}-e2e-
+            ${{ runner.os }}-
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v1.1.0
+        with:
+          minikube version: 'v1.9.2'
+          kubernetes version: 'v1.18.2'
+          github token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test
+        run: operator-sdk test local ./test/e2e --image ${{ jobs.build.steps.build.outputs.image }} --go-test-flags "-v"
