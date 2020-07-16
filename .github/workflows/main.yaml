@@ -78,7 +78,7 @@ jobs:
             ${{ runner.os }}-
       - name: Get version
         run: |
-          VERSION=$(grep Version version/version.go | awk -F'"' '{print $2}')
+          VERSION=`grep Version version/version.go | awk -F'"' '{print $2}'`
           echo "::set-output name={version}::{"${VERSION}"}"
         id: version
       - name: Build
