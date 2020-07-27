@@ -14,6 +14,7 @@ import (
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/operator-framework/operator-sdk/pkg/test/e2eutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	appsv1 "k8s.io/api/apps/v1"
 )
 
 func TestSonarQube(t *testing.T) {
@@ -70,6 +71,17 @@ func sonarqubeserverDeployTest(t *testing.T, f *framework.Framework, ctx *framew
 	// wait for sonarqubeserver to reach 1 replica
 	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, name, 1, retryInterval, timeout)
 	if err != nil {
+		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, sonarQubeServer)
+		if err != nil {
+			return err
+		}
+		t.Logf("Deployment wait timeout (CR=>%v)\n", sonarQubeServer)
+		deployment := &appsv1.Deployment{}
+		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, deployment)
+		if err != nil {
+			return err
+		}
+		t.Logf("Deployment wait timeout (deployment=>%v)\n", deployment)
 		return err
 	}
 
