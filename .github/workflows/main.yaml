@@ -117,5 +117,7 @@ jobs:
           kubernetes version: 'v1.18.3'
           github token: ${{ secrets.GITHUB_TOKEN }}
           driver: docker
+      - name: Info
+        run: minikube status ;echo;echo;kubectl get storageclass -o yaml
       - name: Test
         run: operator-sdk test local ./test/e2e --image ${{ needs.build.outputs.image }} --go-test-flags "-v"
