@@ -15,6 +15,7 @@ import (
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/operator-framework/operator-sdk/pkg/test/e2eutil"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -72,23 +73,29 @@ func sonarqubeserverDeployTest(t *testing.T, f *framework.Framework, ctx *framew
 	// wait for sonarqubeserver to reach 1 replica
 	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, name, 1, retryInterval, timeout)
 	if err != nil {
-		if err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, sonarQubeServer); err != nil {
-			return err
+		if lErr := f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, sonarQubeServer); lErr != nil {
+			return lErr
 		}
 		t.Logf("Deployment wait timeout (CR=>%+v)\n", sonarQubeServer.Status)
 		deployment := &appsv1.Deployment{}
-		if err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, deployment); err != nil {
-			return err
+		if lErr := f.Client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, deployment); lErr != nil {
+			return lErr
 		}
 		t.Logf("Deployment wait timeout (deployment=>%s)\n", deployment.String())
 		replicaSetList := &appsv1.ReplicaSetList{}
 		listOpts := []client.ListOption{
 			client.InNamespace(namespace),
+			client.MatchingLabels(map[string]string{"sonarsource.jfowler.github.io/SonarQubeServer": name}),
 		}
-		if err := f.Client.List(goctx.TODO(), replicaSetList, listOpts...); err != nil {
-			return err
+		if lErr := f.Client.List(goctx.TODO(), replicaSetList, listOpts...); lErr != nil {
+			return lErr
 		}
 		t.Logf("Deployment wait timeout (ReplicaSet=>%s)\n", replicaSetList.String())
+		podList := &corev1.PodList{}
+		if lErr := f.Client.List(goctx.TODO(), podList, listOpts...); lErr != nil {
+			return lErr
+		}
+		t.Logf("Deployment wait timeout (Pods=>%s)\n", podList.String())
 		return err
 	}
 
