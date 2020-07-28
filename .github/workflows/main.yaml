@@ -116,5 +116,6 @@ jobs:
           minikube version: 'v1.12.1'
           kubernetes version: 'v1.18.3'
           github token: ${{ secrets.GITHUB_TOKEN }}
+          drive: docker
       - name: Test
         run: operator-sdk test local ./test/e2e --image ${{ needs.build.outputs.image }} --go-test-flags "-v"
