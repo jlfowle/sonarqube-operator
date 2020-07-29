@@ -53,8 +53,7 @@ func (r *ReconcileSonarQube) newPVC(cr *sonarsourcev1alpha1.SonarQube) (*corev1.
 			Resources: corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{},
 			},
-			VolumeMode:       &[]corev1.PersistentVolumeMode{corev1.PersistentVolumeFilesystem}[0],
-			StorageClassName: cr.Spec.NodeConfig.StorageClass,
+			VolumeMode: &[]corev1.PersistentVolumeMode{corev1.PersistentVolumeFilesystem}[0],
 		},
 	}
 
@@ -63,6 +62,10 @@ func (r *ReconcileSonarQube) newPVC(cr *sonarsourcev1alpha1.SonarQube) (*corev1.
 		storageSize = DefaultVolumeSize
 	} else {
 		storageSize = *cr.Spec.NodeConfig.StorageSize
+	}
+
+	if cr.Spec.NodeConfig.StorageClass != nil {
+		dep.Spec.StorageClassName = cr.Spec.NodeConfig.StorageClass
 	}
 
 	if size, err := resource.ParseQuantity(storageSize); err != nil {
