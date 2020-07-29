@@ -13,7 +13,7 @@ func TestMain(m *testing.M) {
 
 var (
 	retryInterval        = time.Second * 5
-	timeout              = time.Second * 120
+	timeout              = time.Second * 240
 	cleanupRetryInterval = time.Second * 1
 	cleanupTimeout       = time.Second * 5
 )
