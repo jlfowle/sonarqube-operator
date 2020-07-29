@@ -120,10 +120,10 @@ jobs:
       - name: Info
         run: |
           minikube status
+          minikube addons list
           kubectl get storageclass -o yaml
           kubectl get nodes -o yaml
-          mkdir /tmp/pv
-          chmod 777 /tmp/pv
+          minikube ssh --  "mkdir /tmp/pv && chmod 777 /tmp/pv"
           kubectl apply -f test/e2e/pv.yaml
       - name: Test
         run: operator-sdk test local ./test/e2e --image ${{ needs.build.outputs.image }} --go-test-flags "-v"
