@@ -123,6 +123,6 @@ jobs:
           kubectl get storageclass -o yaml
           mkdir /tmp/pv
           chmod 777 /tmp/pv
-          echo -e "apiVersion: v1\nkind: PersistentVolume\nmetadata:\n  name: task-pv-volume\n  labels:\n    type: local\nspec:\n  capacity:\n    storage: 10Gi\n  accessModes:\n    - ReadWriteOnce\n  local:\n    path: \"/tmp/pv\"" | kubectl apply -f -
+          kubectl apply -f test/e2e/pv.yaml
       - name: Test
         run: operator-sdk test local ./test/e2e --image ${{ needs.build.outputs.image }} --go-test-flags "-v"
