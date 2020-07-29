@@ -96,11 +96,20 @@ func sonarqubeserverDeployTest(t *testing.T, f *framework.Framework, ctx *framew
 			return lErr
 		}
 		t.Logf("Deployment wait timeout (Pods=>%s)\n", podList.String())
+		eventListOpts := []client.ListOption{
+			client.InNamespace(namespace),
+		}
+		eventList := &corev1.EventList{}
+		if lErr := f.Client.List(goctx.TODO(), eventList, eventListOpts...); lErr != nil {
+			return lErr
+		}
+		t.Logf("Deployment wait timeout (Events=>%s)\n", eventList.String())
 		pvcList := &corev1.PersistentVolumeClaimList{}
 		if lErr := f.Client.List(goctx.TODO(), pvcList, listOpts...); lErr != nil {
 			return lErr
 		}
-		t.Logf("Deployment wait timeout (Pods=>%s)\n", pvcList.String())
+		t.Logf("Deployment wait timeout (PVC=>%s)\n", pvcList.String())
+
 		return err
 	}
 

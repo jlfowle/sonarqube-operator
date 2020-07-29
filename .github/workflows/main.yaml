@@ -121,6 +121,7 @@ jobs:
         run: |
           minikube status
           kubectl get storageclass -o yaml
+          kubectl get nodes -o yaml
           mkdir /tmp/pv
           chmod 777 /tmp/pv
           kubectl apply -f test/e2e/pv.yaml
